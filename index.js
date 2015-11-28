@@ -4,7 +4,7 @@ var express = require('express'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     config = require('./config/config'),
-    port = 8080,
+    port = config.port || 8080,
     routes;
 
 mongoose.connect(config.database);
@@ -19,4 +19,4 @@ module.exports.express = express;
 module.exports.app = app;
 routes = require('./routes');
 
-console.log('Listening ' + port);
+console.log('Listening to port ' + port);

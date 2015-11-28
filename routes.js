@@ -11,7 +11,6 @@ apiRoutes.post('/authenticate', authenticationController.authenticate);
 
 apiRoutes.use(jwtService.validateToken);
 
-apiRoutes.get('/', homeController.displayHome);
 apiRoutes.get('/authentications', authenticationController.getAuthenticationAttempts);
 apiRoutes.get('/users', usersController.getUsers);
 

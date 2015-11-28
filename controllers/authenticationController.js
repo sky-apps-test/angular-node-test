@@ -1,4 +1,5 @@
-var AuthenticationAttempt = require('../models/authenticationAttempt'),
+var AuthenticationAttemptModel = require('../models/authenticationAttempt'),
+    AuthenticationAttempt = AuthenticationAttemptModel.getModelInstance(),
     User = require('../models/user'),
     jwtService = require('../services/jwtService');
 
@@ -48,17 +49,11 @@ exports.authenticate = function(req, res){
                 });
             }
 
-            var newAuthenticationAttempt = new AuthenticationAttempt({
-                ip: req.connection.remoteAddress,
-                action: authenticated ? 'AUTH_SUCCESS' : 'AUTH_FAILURE',
-                username: req.body.username
-            });
-
-            newAuthenticationAttempt.save(function(err) {
-                if (err) throw err;
-
-                console.log('Authentication saved');
-            });
+            AuthenticationAttemptModel.saveAuthenticationAttempt(
+                req.body.username,
+                req.connection.remoteAddress,
+                authenticated
+            );
         }
     );
 };
