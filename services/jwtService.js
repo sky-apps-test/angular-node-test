@@ -1,10 +1,10 @@
 var jwt = require('jsonwebtoken'),
-    app = module.parent.exports.app,
-    jwtSecret = app.get('jwtSecret');
+    config = require('../config/config');
 
 var jwtHandler = {
     validateToken: function(req, res, next) {
-        var token = req.headers['x-access-token'];
+        var that = this,
+            token = req.headers['x-access-token'];
 
         if (token === undefined) {
             return res.status(403).send({
@@ -13,9 +13,9 @@ var jwtHandler = {
             });
         }
 
-        jwt.verify(token, jwtSecret, function(err, decoded) {
+        jwt.verify(token, config.JWTSecret, function(err, decoded) {
             if (err) {
-                res.json({
+                return res.json({
                     success: false,
                     message: 'Failed to authenticate token.'
                 });
@@ -25,16 +25,19 @@ var jwtHandler = {
             next();
         });
     },
-    createToken: function (user) {
+    createToken: function (username, ip) {
         return jwt.sign(
-            user,
-            app.get('superSecret'),
             {
-                expiresInMinutes: 1440 // expires in 24 hours
+                username: username,
+                ip: ip
+            },
+            config.JWTSecret,
+            {
+                expiresIn: 1440
             }
         )
     }
 };
 
 exports.validateToken = jwtHandler.validateToken;
-exports.createToken = jwtHandler.validateToken;
+exports.createToken = jwtHandler.createToken;

@@ -1,11 +1,11 @@
 var User = require('../models/user');
 
 var usersController = {
-    getUsers: function () {
+    getUsers: function (req, res) {
         User.find(
             {},
             function(err, users) {
-                res.json(users);
+                return res.json(users);
             }
         );
     },
