@@ -1,0 +1,9 @@
+<h1> Authentications </h1>
+<ul ng-controller="AuthenticationsController">
+  <li ng-repeat="authentication in authentications">
+    <h2>{{authentication.username}}</h2>
+    <p>{{authentication.action}}</p>
+    <p>{{authentication.datetime | date:'dd-MM-yyyy HH:mm:ss' }}</p>
+    <p>{{authentication.ip }}</p>
+  </li>
+</ul>

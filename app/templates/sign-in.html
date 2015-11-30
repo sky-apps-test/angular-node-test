@@ -1,11 +1,11 @@
-<form ng-submit="processForm()">
+<form ng-submit="processForm()" name="authenticationForm">
   <div id="username" class="form-group">
-    <input type="text" name="username" class="form-control" placeholder="Username">
+    <input type="text" name="username" class="form-control" placeholder="Username" ng-model="formData.username">
     <span class="help-block"></span>
   </div>
 
   <div id="password" class="form-group">
-    <input type="password" name="password" class="form-control" placeholder="Password">
+    <input type="password" name="password" class="form-control" placeholder="Password" ng-model="formData.password">
     <span class="help-block"></span>
   </div>
 

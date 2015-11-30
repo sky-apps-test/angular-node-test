@@ -1,31 +1,60 @@
-var formControllers = angular.module('formControllers', []);
+var skyTestAppControllers = angular.module('skyTestAppControllers', []);
 
-formControllers.controller('FormController', ['$scope', '$http',
-    function ($scope, $http) {
+skyTestAppControllers.controller('FormController', [
+    '$scope',
+    '$http',
+    '$location',
+    '$cookies',
+    'formDataSerializer',
+    function ($scope, $http, $location, $cookies, formDataSerializer) {
+        $scope.formData = {};
+
         $scope.processForm = function() {
             $http({
                 method  : 'POST',
                 url     : 'http://localhost:8080/api/authenticate',
-                data    : '',
-                headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                transformRequest: formDataSerializer,
+                data    : this.formData,
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
             })
             .success(function(data) {
-                console.log(data);
+                $cookies.put('token', data.token);
 
-                if (!data.success) {
-                    // if not successful, bind errors to error variables
-                    $scope.errorName = data.errors.name;
-                    $scope.errorSuperhero = data.errors.superheroAlias;
-                } else {
-                    // if successful, bind success message to message
-                    $scope.message = data.message;
-                }
+                $location.path('/authentications');
+            })
+            .error(function(error) {
+                alert(error.message);
             });
         };
-        // $http.get('http://localhost:8080/api/authenticate').success(function(data) {
-        //     $scope.phones = data;
-        // });
-        //
-        // $scope.orderProp = 'age';
+    }
+]);
+
+skyTestAppControllers.controller('AuthenticationsController', [
+    '$scope',
+    '$http',
+    '$cookies',
+    function ($scope, $http, $cookies) {
+        $http({
+            method  : 'GET',
+            url     : 'http://localhost:8080/api/authentications',
+            headers: {
+                'x-access-token': $cookies.get('token')
+            }
+        })
+        .success(function(data) {
+            $scope.authentications = data;
+        })
+    }
+]);
+
+skyTestAppControllers.controller('LinksController', [
+    '$scope',
+    '$cookies',
+    function ($scope, $cookies) {
+        $scope.signOut = function () {
+            $cookies.remove('token');
+        };
     }
 ]);

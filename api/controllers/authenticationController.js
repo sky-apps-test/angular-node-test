@@ -4,6 +4,18 @@ var AuthenticationAttemptModel = require('../models/authenticationAttempt'),
     jwtService = require('../services/jwtService');
 
 exports.getAuthenticationAttempts = function (req, res) {
+    var decodedToken = jwtService.getDecodedToken();
+
+    if (
+        decodedToken.username === undefined
+        || (decodedToken.username === 'admin') === false
+    ) {
+        return res.json({
+            success: 'false',
+            message: 'You must be an admin in order to access this section.'
+        });
+    }
+
     AuthenticationAttempt.find(
         {},
         function(err, authenticationAttempts) {
@@ -13,7 +25,6 @@ exports.getAuthenticationAttempts = function (req, res) {
 };
 
 exports.authenticate = function(req, res){
-    console.log(req.body);
     if (req.body.username === undefined) {
         res.status(404).json({
             success: false,
@@ -30,12 +41,12 @@ exports.authenticate = function(req, res){
                 var authenticated = false;
 
                 if (user === null) {
-                    res.json({
+                    res.status(404).json({
                         success: false,
                         message: 'Authentication failed. User not found.'
                     });
                 } else if (user.password !== req.body.password) {
-                    res.json({
+                    res.status(404).json({
                         success: false,
                         message: 'Authentication failed. Wrong password.'
                     });
@@ -46,6 +57,8 @@ exports.authenticate = function(req, res){
                     );
 
                     authenticated = true;
+
+                    jwtService.setAccessToken(token);
 
                     res.json({
                         success: true,

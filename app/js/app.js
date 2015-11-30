@@ -1,9 +1,10 @@
-var formApp = angular.module('formApp', [
+var skyAppTest = angular.module('skyAppTest', [
   'ngRoute',
-  'formControllers'
+  'ngCookies',
+  'skyTestAppControllers'
 ]);
 
-formApp.config(['$routeProvider', function($routeProvider) {
+skyAppTest.config(['$routeProvider', function($routeProvider) {
     $routeProvider.
     when('/sign-in', {
         templateUrl: 'templates/sign-in.html',
@@ -15,7 +16,7 @@ formApp.config(['$routeProvider', function($routeProvider) {
     }).
     when('/authentications', {
         templateUrl: 'templates/authentications.html',
-        controller: 'FormController'
+        controller: 'AuthenticationsController'
     }).
     otherwise({
         redirectTo: '/sign-in'

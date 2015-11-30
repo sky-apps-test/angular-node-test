@@ -1,43 +1,66 @@
-var jwt = require('jsonwebtoken'),
-    config = require('../config/config');
+(function () {
+    'use strict';
 
-var jwtHandler = {
-    validateToken: function(req, res, next) {
-        var that = this,
-            token = req.headers['x-access-token'];
+    var jwt = require('jsonwebtoken'),
+        config = require('../config/config'),
+        decodedToken = {},
+        accessToken = '';
 
-        if (token === undefined) {
-            return res.status(403).send({
-                success: false,
-                message: 'No token provided.'
-            });
-        }
+    var jwtHandler = {
+        setAccessToken: function (token) {
+            accessToken = token;
+        },
+        getAccessToken: function () {
+            return accessToken;
+        },
+        setDecodedToken: function (token) {
+            decodedToken = token;
+        },
+        getDecodedToken: function () {
+            return decodedToken;
+        },
+        validateToken: function(req, res, next) {
+            var that = this,
+                token = req.headers['x-access-token'];
 
-        jwt.verify(token, config.JWTSecret, function(err, decoded) {
-            if (err) {
-                return res.json({
+            if (token === undefined) {
+                return res.status(403).send({
                     success: false,
-                    message: 'Failed to authenticate token.'
+                    message: 'No token provided.'
                 });
             }
 
-            req.decoded = decoded;
-            next();
-        });
-    },
-    createToken: function (username, ip) {
-        return jwt.sign(
-            {
-                username: username,
-                ip: ip
-            },
-            config.JWTSecret,
-            {
-                expiresIn: 1440
-            }
-        )
-    }
-};
+            jwt.verify(token, config.JWTSecret, function(err, decoded) {
+                if (err) {
+                    return res.json({
+                        success: false,
+                        message: 'Failed to authenticate token.'
+                    });
+                }
 
-exports.validateToken = jwtHandler.validateToken;
-exports.createToken = jwtHandler.createToken;
+                jwtHandler.setDecodedToken(decoded);
+
+                req.decoded = decoded;
+                next();
+            });
+        },
+        createToken: function (username, ip) {
+            return jwt.sign(
+                {
+                    username: username,
+                    ip: ip
+                },
+                config.JWTSecret,
+                {
+                    expiresIn: 1440
+                }
+            )
+        }
+    };
+
+    exports.validateToken = jwtHandler.validateToken;
+    exports.createToken = jwtHandler.createToken;
+    exports.getDecodedToken = jwtHandler.getDecodedToken;
+    exports.setAccessToken = jwtHandler.setAccessToken;
+    exports.getAccessToken = jwtHandler.getAccessToken;
+})();
